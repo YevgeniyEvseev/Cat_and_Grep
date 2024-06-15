@@ -6,22 +6,34 @@
 #include <string.h>
 
 int main(int argc, char **argv) {
+  opt option = {0};
+
   if (argc < 3) {
     printf(
         "Usage: grep [OPTION]... PATTERNS [FILE]...\nTry 'grep --help' for "
         "more information.'\n'");
     return 1;
   }
+  struct str_pattern *pattern = init_pattern();
+  read_options(pattern, argc, argv, &option);
+  if (options->e == 0 && options->f == 0) {
+    add_to_pattern(str, optarg);
+  }
+  char str[2048] = {0};
+  get_pattern(pattern, str);
+  printf("%s", str);
+  erase_pattern(pattern);
 }
 
-void read_options(char *str, int argc, char *argv[], opt *options) {
+void read_options(struct str_pattern *str, int argc, char *argv[],
+                  opt *options) {
   int c;
 
   while ((c = getopt_long(argc, argv, "e:sivclnhf:o", NULL, NULL)) != -1) {
     switch (c) {
       case 'e':
         options->e = 1;
-        add_pattern(str, optarg);
+        add_to_pattern(str, optarg);
         break;
 
       case 'i':
@@ -72,9 +84,9 @@ void read_options(char *str, int argc, char *argv[], opt *options) {
   }
 }
 
-void add_pattern(char *pattern, char *src) {
-  if (strlen(pattern)) {
-    strcat(pattern, "|");
+void add_to_pattern(struct str_pattern *pattern, char *str) {
+  if (len_pattern(pattern)) {
+    add_pattern(pattern, "|");
   }
-  strcat(pattern, src);
+  add_pattern(pattern, str);
 }

@@ -3,7 +3,7 @@ FLAGS = -Wall -Wextra -Werror
 all: cat
 
 cat: grep_my.c
-	gcc  grep_my.c -o ./test/grep_my
+	gcc -g grep_my.c pattern.c -o grep_my
 
 test:
 	sh ./test/test_func_cat.sh
