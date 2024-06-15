@@ -11,7 +11,6 @@ int main(int argc, char **argv) {
   FILE *file;
   regex_t reg;
   regmatch_t pm[10];
-  char *buffer;
   if (argc < 3) {
     printf(
         "Usage: grep [OPTION]... PATTERNS [FILE]...\nTry 'grep --help' for "
@@ -19,6 +18,7 @@ int main(int argc, char **argv) {
     return 1;
   }
   struct str_pattern *pattern = init_pattern();
+  struct str_pattern *buffer = init_pattern();
   read_options(pattern, argc, argv, &option);
   if (option.e == 0 && option.f == 0) add_to_pattern(pattern, argv[optind++]);
   int cflags = REG_NEWLINE | REG_EXTENDED;
@@ -37,15 +37,12 @@ int main(int argc, char **argv) {
   free(str);
   for (; optind < argc; optind++) {
     file = fopen(argv[optind], 'r');
-    if(file==NULL) {
+    if (file == NULL) {
       printf("grep: dddd: No such file or directory\n");
     }
-    while (fgetc())
-    {
-      /* code */
+    char *str_tmp[128] = {0};
+    while (fgets(str_tmp, 128, file) == NULL) {
     }
-    
-
   }
 
   printf("%s", str);

@@ -23,6 +23,7 @@ void add_pattern(struct str_pattern *pattern, char *str);
 int is_empty(const struct str_pattern *pattern);
 int len_pattern(const struct str_pattern *pattern);
 void erase_pattern(struct str_pattern *pattern);
+void clear_pattern(struct str_pattern *pattern);
 
 void read_options(struct str_pattern *pattern, int argc, char *argv[], opt *options);
 void add_to_pattern(struct str_pattern *pattern, char *str);

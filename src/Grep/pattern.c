@@ -57,3 +57,10 @@ void erase_pattern(str_pattern *pattern) {
   free(pattern->data);
   free(pattern);
 }
+
+void clear_pattern(str_pattern *pattern) {
+  for (; *(pattern->data) != 0; pattern->data++) {
+    *(pattern->data) = '\0';
+  }
+  pattern->len = 0;
+}
