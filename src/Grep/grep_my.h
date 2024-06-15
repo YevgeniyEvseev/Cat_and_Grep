@@ -27,4 +27,7 @@ void erase_pattern(struct str_pattern *pattern);
 void read_options(struct str_pattern *pattern, int argc, char *argv[], opt *options);
 void add_to_pattern(struct str_pattern *pattern, char *str);
 
+void get_data_from_regcomp(const int optind, const char **argv, regex_t *reg,
+                           opt *option);
+
 #endif

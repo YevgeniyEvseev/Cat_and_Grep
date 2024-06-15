@@ -1,13 +1,16 @@
 #include "grep_my.h"
 
 #include <getopt.h>
+#include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 int main(int argc, char **argv) {
   opt option = {0};
-
+  FILE *file;
+  regex_t reg;
+  regmatch_t pm[10];
   if (argc < 3) {
     printf(
         "Usage: grep [OPTION]... PATTERNS [FILE]...\nTry 'grep --help' for "
@@ -16,11 +19,28 @@ int main(int argc, char **argv) {
   }
   struct str_pattern *pattern = init_pattern();
   read_options(pattern, argc, argv, &option);
-  if (options->e == 0 && options->f == 0) {
-    add_to_pattern(str, optarg);
+  if (option.e == 0 && option.f == 0) add_to_pattern(pattern, argv[optind++]);
+  int cflags = REG_NEWLINE | REG_EXTENDED;
+  if (option.i == 1) {
+    cflags = REG_NEWLINE | REG_EXTENDED | REG_ICASE;
   }
-  char str[2048] = {0};
+  char *str = malloc((len_pattern(pattern) + 1) * sizeof(char));
   get_pattern(pattern, str);
+  int z = regcomp(&reg, str, cflags);
+  if (z != 0) {
+    char error_buf[1024] = {0};
+    regerror(z, &reg, error_buf, sizeof(error_buf));
+    fprintf(stderr, "%s: pattern '%s' \n", error_buf, str);
+    return 1;
+  }
+  free(str);
+  for (; optind < argc; optind++) {
+    file = fopen(argv[optind], 'r');
+    if(file==NULL) {
+      printf("")
+    }
+  }
+
   printf("%s", str);
   erase_pattern(pattern);
 }
@@ -90,3 +110,5 @@ void add_to_pattern(struct str_pattern *pattern, char *str) {
   }
   add_pattern(pattern, str);
 }
+
+void get_data_from_regcomp(const int optind, regex_t *reg, opt *option) {}
