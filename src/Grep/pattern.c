@@ -31,13 +31,25 @@ void add_pattern(str_pattern *pattern, char *str) {
   while (pattern->cap - pattern->len - 1 < len_str) {
     pattern->cap += len_str;
     pattern->cap *= 2;
-    if ((pattern->data = realloc(
-             pattern->data, (pattern->cap + len_str) * sizeof(char))) == NULL)
+    if ((pattern->data =
+             realloc(pattern->data, (pattern->cap) * sizeof(char))) == NULL)
       exit(1);
   }
   pattern->len += len_str;
   strcat(pattern->data, str);
 }
+
+void add_pattern_char(str_pattern *pattern, char charac) {
+  while (pattern->cap - pattern->len - 1 < 1) {
+    pattern->cap *= 2;
+    if ((pattern->data =
+             realloc(pattern->data, (pattern->cap) * sizeof(char))) == NULL)
+      exit(1);
+  }
+  pattern->len += 1;
+  *(pattern->data + pattern->len) = charac;
+}
+
 int is_empty(const str_pattern *pattern) { return (pattern->len == 0) ? 1 : 0; }
 int len_pattern(const str_pattern *pattern) { return pattern->len; }
 

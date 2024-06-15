@@ -11,6 +11,7 @@ int main(int argc, char **argv) {
   FILE *file;
   regex_t reg;
   regmatch_t pm[10];
+  char *buffer;
   if (argc < 3) {
     printf(
         "Usage: grep [OPTION]... PATTERNS [FILE]...\nTry 'grep --help' for "
@@ -37,8 +38,14 @@ int main(int argc, char **argv) {
   for (; optind < argc; optind++) {
     file = fopen(argv[optind], 'r');
     if(file==NULL) {
-      printf("")
+      printf("grep: dddd: No such file or directory\n");
     }
+    while (fgetc())
+    {
+      /* code */
+    }
+    
+
   }
 
   printf("%s", str);
