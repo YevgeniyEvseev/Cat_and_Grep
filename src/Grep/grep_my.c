@@ -40,13 +40,22 @@ int main(int argc, char **argv) {
     if (file == NULL) {
       printf("grep: dddd: No such file or directory\n");
     }
-    char *str_tmp[128] = {0};
-    while (fgets(str_tmp, 128, file) == NULL) {
+    char *str_tmp[1024] = {0};
+    cstr(buffer, str_tmp);
+    while (fgets(str_tmp, 1024, file) == NULL) {
+      add_to_pattern(buffer, str_tmp);
+      if (str_tmp[1023] != '\0' || str_tmp[1023] != '\n') {
+        continue;
+      }
+      // int z = regexec(&reg, buffer, 10, pm, 0);
+      // print_result()
+      clear_pattern(buffer);
     }
   }
 
   printf("%s", str);
   erase_pattern(pattern);
+  erase_pattern(buffer);
 }
 
 void read_options(struct str_pattern *str, int argc, char *argv[],
