@@ -19,6 +19,7 @@ struct str_pattern;
 struct str_pattern *init_pattern();
 void cstr(struct str_pattern *pattern, char *str);
 void get_pattern(const struct str_pattern *pattern, char *str);
+char *get_str(const struct str_pattern *pattern);
 void add_pattern(struct str_pattern *pattern, char *str);
 int is_empty(const struct str_pattern *pattern);
 int len_pattern(const struct str_pattern *pattern);
@@ -27,6 +28,7 @@ void clear_pattern(struct str_pattern *pattern);
 
 void read_options(struct str_pattern *pattern, int argc, char *argv[], opt *options);
 void add_to_pattern(struct str_pattern *pattern, char *str);
+void print_result(char *str, char *name_file, char *pattern, int num_str, regmatch_t *pm, opt *option);
 
 //void get_data_from_regcomp(const int optind, const char **argv, regex_t *reg,
  //                          opt *option);

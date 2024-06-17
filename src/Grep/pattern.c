@@ -26,6 +26,10 @@ void get_pattern(const str_pattern *pattern, char *str) {
   strcpy(str, pattern->data);
 }
 
+char *get_str(const str_pattern *pattern){
+  return pattern->data;
+}
+
 void add_pattern(str_pattern *pattern, char *str) {
   int len_str = strlen(str);
   while (pattern->cap - pattern->len - 1 < len_str) {
@@ -41,6 +45,7 @@ void add_pattern(str_pattern *pattern, char *str) {
 
 void add_pattern_char(str_pattern *pattern, char charac) {
   while (pattern->cap - pattern->len - 1 < 1) {
+    if(pattern->cap==0) pattern->cap=1;
     pattern->cap *= 2;
     if ((pattern->data =
              realloc(pattern->data, (pattern->cap) * sizeof(char))) == NULL)
@@ -59,8 +64,10 @@ void erase_pattern(str_pattern *pattern) {
 }
 
 void clear_pattern(str_pattern *pattern) {
-  for (; *(pattern->data) != 0; pattern->data++) {
+  char *tmp=pattern->data;
+  for (; *(pattern->data) != '\0'; pattern->data++) {
     *(pattern->data) = '\0';
   }
+  pattern->data=tmp;
   pattern->len = 0;
 }
