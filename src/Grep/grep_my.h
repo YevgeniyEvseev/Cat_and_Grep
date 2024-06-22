@@ -1,6 +1,10 @@
 #ifndef GREP_MY_H
 #define GREP_MY_H
 
+#define Nmax 1024
+
+#include <regex.h>
+
 typedef struct options {
   int e;
   int i;
@@ -14,23 +18,28 @@ typedef struct options {
   int o;
 } opt;
 
-struct str_pattern;
+struct C_string;
 
-struct str_pattern *init_pattern();
-void cstr(struct str_pattern *pattern, char *str);
-void get_pattern(const struct str_pattern *pattern, char *str);
-char *get_str(const struct str_pattern *pattern);
-void add_pattern(struct str_pattern *pattern, char *str);
-int is_empty(const struct str_pattern *pattern);
-int len_pattern(const struct str_pattern *pattern);
-void erase_pattern(struct str_pattern *pattern);
-void clear_pattern(struct str_pattern *pattern);
+struct C_string *init_string();
+void cstr(struct C_string *pattern, char *str);
+void get_string(const struct C_string *pattern, char *str);
+char *get_str(const struct C_string *pattern);
+void add_string(struct C_string *pattern, char *str);
+void add_string_int(struct C_string *pattern, int n);
+int is_empty(const struct C_string *pattern);
+int len_string(const struct C_string *pattern);
+void erase_string(struct C_string *pattern);
+void clear_string(struct C_string *pattern);
 
-void read_options(struct str_pattern *pattern, int argc, char *argv[], opt *options);
-void add_to_pattern(struct str_pattern *pattern, char *str);
-void print_result(char *str, char *name_file, char *pattern, int num_str, regmatch_t *pm, opt *option);
+void read_options(struct C_string *pattern, int argc, char *argv[],
+                  opt *options);
+void add_to_pattern(struct C_string *pattern, char *str);
+void print_result(char *str, char *name_file, int num_str, opt *option);
 
-//void get_data_from_regcomp(const int optind, const char **argv, regex_t *reg,
- //                          opt *option);
+void error_grep(int reg_er, const regex_t *reg, int grep_er, char *src);
+void option_f(struct C_string *str, char *argv);
+void option_o(regex_t *reg, char *str, char *name_file, int num_str,
+              regmatch_t *pm, opt *option);
+// void preproc_regcomp(int argc, char **argv);
 
 #endif

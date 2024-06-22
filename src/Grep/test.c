@@ -4,15 +4,19 @@
 #include "grep_my.h"
 
 int main() {
-  struct str_pattern *buf = init_pattern();
+  struct C_string *buf = init_string();
   char str[100] = {0};
   cstr(buf, "");
-  add_pattern(buf, "fuc");
-  get_pattern(buf, str);
+  add_string(buf, "fuc");
+  get_string(buf, str);
   printf("%s", str);
-  clear_pattern(buf);
-  add_pattern(buf, " you");
-  
+  clear_string(buf);
+  add_string(buf, " you");
+
   printf("%s", get_str(buf));
-  erase_pattern(buf);
+  add_string_int(buf, 12345);
+  get_string(buf, str);
+  printf("%s", str);
+
+  erase_string(buf);
 }
