@@ -33,6 +33,8 @@ void clear_string(struct C_string *pattern);
 
 void read_options(struct C_string *pattern, int argc, char *argv[],
                   opt *options);
+void read_file(char *argv, regex_t *reg, opt *option);
+
 void add_to_pattern(struct C_string *pattern, char *str);
 void print_result(char *str, char *name_file, int num_str, opt *option);
 

@@ -10,7 +10,7 @@ int main(int argc, char **argv) {
   FILE *file;
   regex_t reg;
   regmatch_t pm[10];
-
+  
   if (argc < 3) return 1;
   struct C_string *pattern = init_string();
   struct C_string *buffer = init_string();
@@ -28,6 +28,7 @@ int main(int argc, char **argv) {
     error_grep(z, &reg, -1, str);
     return 1;
   }
+    
   for (; optind < argc; optind++) {
     int count_str_in_file = 0, num_str = 0;
     file = fopen(argv[optind], "r");
@@ -118,6 +119,8 @@ void read_options(struct C_string *str, int argc, char *argv[], opt *options) {
         break;
     }
   }
+
+  if(argc-optind>0 && options->h == 0)  options->h = 0; 
   if (options->l == 1) {
     options->c = 0;
     options->n = 0;

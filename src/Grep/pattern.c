@@ -60,6 +60,8 @@ int is_empty(const C_string *pattern) { return (pattern->len == 0) ? 1 : 0; }
 int len_string(const C_string *pattern) { return pattern->len; }
 
 void erase_string(C_string *pattern) {
+  pattern->cap = 0;
+  pattern->len = 0;
   free(pattern->data);
   free(pattern);
 }

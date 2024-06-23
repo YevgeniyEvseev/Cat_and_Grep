@@ -2,14 +2,14 @@ FLAGS = -Wall -Wextra -Werror
 
 all: cat
 
-cat: grep_my.c
+grep: grep_my.c
 	gcc -g grep_my.c pattern.c -o ./test/s21_grep
 
-test:
-	sh ./test/test_func_cat.sh
+tests: test_func_cat.sh
+	cd test && bash ./test_func_cat.sh
 
 light_test:
 	sh ./test_l/test.sh
 
 clean: 
-	rm -f ./test/s21_cat
+	rm -f ./test/s21_grep

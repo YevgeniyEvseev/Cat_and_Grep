@@ -7,14 +7,11 @@
 
 int main(int argc, char **argv) {
   opt option = {0};
-  FILE *file;
+
   regex_t reg;
-  regmatch_t pm[10];
 
   if (argc < 3) return 1;
   struct C_string *pattern = init_string();
-  struct C_string *buffer = init_string();
-  cstr(buffer, "");
   cstr(pattern, "");
   read_options(pattern, argc, argv, &option);
   if (option.e == 0 && option.f == 0) add_to_pattern(pattern, argv[optind++]);
@@ -29,42 +26,56 @@ int main(int argc, char **argv) {
     return 1;
   }
   for (; optind < argc; optind++) {
-    int count_str_in_file = 0, num_str = 0;
-    file = fopen(argv[optind], "r");
-    if (file == NULL) {
-      if (!option.s) {
-        fprintf(stderr, "grep: %s: No such file or directory\n", argv[optind]);
-        continue;
-      }
-    }
-    char str_tmp[1024] = {0};
-    while (fgets(str_tmp, 1024, file) != NULL) {
-      add_to_pattern(buffer, str_tmp);
-      if (!(str_tmp[1023] == '\0' || str_tmp[1023] == '\n')) {
-        continue;
-      }
-      num_str++;
-      char *str_in_file = get_str(buffer);
-      z = regexec(&reg, str_in_file, 10, pm, 0);
-      if (z == 0 || (z = REG_NOMATCH && option.v)) {
-        if (option.o) {
-          option_o(&reg, str_in_file, argv[optind], num_str, pm, &option);
-        }
-        count_str_in_file++;
-        if (option.c == 0 && option.l == 0 && option.o == 0)
-          print_result(str_in_file, argv[optind], num_str, &option);
-      } else {
-        // error_grep(z, &reg, -1, str_in_file);
-      }
-      clear_string(buffer);
-    }
-    if (option.c == 1 || option.l == 1)
-      print_result("", argv[optind], count_str_in_file, &option);
-    fclose(file);
+    read_file(argv[optind], &reg, &option);
   }
   regfree(&reg);
   erase_string(pattern);
+}
+
+void read_file(char *argv, regex_t *reg, opt *option) {
+  regmatch_t pm[10];
+  struct C_string *buffer = init_string();
+  cstr(buffer, "");
+  int count_str_in_file = 0, num_str = 0, count_not_str_in_file = 0;
+  FILE *file = fopen(argv, "r");
+  if (file == NULL) {
+    if (!option->s) {
+      fprintf(stderr, "grep: %s: No such file or directory\n", argv);
+      return;
+    }
+  }
+  char str_tmp[1024] = {0};
+  while (fgets(str_tmp, 1024, file) != NULL) {
+    add_to_pattern(buffer, str_tmp);
+    if (!(str_tmp[1023] == '\0' || str_tmp[1023] == '\n')) {
+      continue;
+    }
+    num_str++;
+    char *str_in_file = get_str(buffer);
+    int z = regexec(reg, str_in_file, 10, pm, 0);
+    if (z == 0) {
+      if (option->o) {
+        option_o(reg, str_in_file, argv, num_str, pm, option);
+      }
+      count_str_in_file++;
+    } else if (z == REG_NOMATCH) {
+      if (option->v) count_not_str_in_file++;
+    } else {
+      continue;
+      error_grep(z, reg, -1, str_in_file);
+    }
+    if (option->c == 0 && option->l == 0 && option->o == 0)
+      print_result(str_in_file, argv, num_str, option);
+    clear_string(buffer);
+  }
+  if (option->c == 1 || option->l == 1) {
+    if (option->v)
+      print_result("", argv, count_not_str_in_file, option);
+    else
+      print_result("", argv, count_str_in_file, option);
+  }
   erase_string(buffer);
+  fclose(file);
 }
 
 void read_options(struct C_string *str, int argc, char *argv[], opt *options) {
@@ -118,6 +129,8 @@ void read_options(struct C_string *str, int argc, char *argv[], opt *options) {
         break;
     }
   }
+  if (argc - optind - 2 <= 0 && options->h == 0 && options->e == 0)
+    options->h = 1;
   if (options->l == 1) {
     options->c = 0;
     options->n = 0;
@@ -126,9 +139,9 @@ void read_options(struct C_string *str, int argc, char *argv[], opt *options) {
   }
   if (options->c) {
     options->n = 0;
+    options->o = 0;
   }
 }
-
 void add_to_pattern(struct C_string *pattern, char *str) {
   if (len_string(pattern)) {
     add_string(pattern, "|");
@@ -139,14 +152,17 @@ void add_to_pattern(struct C_string *pattern, char *str) {
 // void get_data_from_regcomp(const int optind, regex_t *reg, opt *option) {}
 
 void print_result(char *str, char *name_file, int num_str, opt *option) {
+  if (option->o && option->v) return;
+  // if (option->o && option->v && option->n) return;
   struct C_string *output = init_string();
   cstr(output, "");
   if (option->h == 0) {
     add_string(output, name_file);
-    add_string(output, ":");
+    // add_string(output, ":");
   }
   if (option->l) {
     if (num_str) {
+      // if (is_empty(output) == 0) add_string(output, ":");
       add_string(output, "\n");
       printf("%s", get_str(output));
       erase_string(output);
@@ -154,13 +170,16 @@ void print_result(char *str, char *name_file, int num_str, opt *option) {
     return;
   }
   if (option->n) {
+    if (is_empty(output) == 0) add_string(output, ":");
     add_string_int(output, num_str);
-    add_string(output, ":");
+    // add_string(output, ":");
   }
   if (option->c == 1) {
+    if (is_empty(output) == 0) add_string(output, ":");
     add_string_int(output, num_str);
     add_string(output, "\n");
   } else {
+    if (is_empty(output) == 0 && strlen(str)) add_string(output, ":");
     add_string(output, str);
   }
   printf("%s", get_str(output));
@@ -180,9 +199,11 @@ void option_f(struct C_string *str, char *argv) {
   char tmp_str[Nmax] = {0};
   FILE *f_patern = fopen(argv, "r");
   if (f_patern == NULL) {
-    printf("grep: %s: Not such file or directory\n", argv);
+    fprintf(stderr, "grep: %s: Not such file or directory\n", argv);
   }
   while (fgets(tmp_str, Nmax, f_patern) != NULL) {
+    int len = strlen(tmp_str) - 1;
+    if (tmp_str[len] == '\n') tmp_str[len] = '\0';
     add_to_pattern(str, tmp_str);
   }
   fclose(f_patern);
@@ -192,6 +213,7 @@ void option_o(regex_t *reg, char *str, char *name_file, int num_str,
               regmatch_t *pm, opt *option) {
   char str_match[Nmax] = {0};
   do {
+    if ((int)pm->rm_so > (int)strlen(str) || pm->rm_eo < 0) break;
     int len = pm->rm_eo - pm->rm_so;
     strncpy(str_match, str + pm->rm_so, len);
     str_match[len] = '\n';
